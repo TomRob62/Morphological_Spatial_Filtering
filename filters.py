@@ -41,7 +41,7 @@ class Morphological_Spatial_Filters:
         # creating space for new enhanced image
         enhanced_copy = numpy.zeros(orig_image.shape, dtype="uint8")
 
-        # changing orig_image dtype because overflow error
+        # changing orig_image dtype because overflow error when applying formula
         orig_image = orig_image.astype("uint16")
 
         for row in range(1, max_row-1):
@@ -50,10 +50,11 @@ class Morphological_Spatial_Filters:
                 pixel_value = 5*(orig_image[row][col]) - orig_image[row+1][col] - orig_image[row-1][col] - \
                 orig_image[row][col+1] - orig_image[row][col-1]
 
-                # restricting maximum pixel values
+                # restricting maximum pixel value to prevent overflow when assigning value
                 if pixel_value > 255:
                     pixel_value = 255
 
+                # applying absolute value to prevent unsisgned overflow
                 enhanced_copy[row][col] = abs(pixel_value)
         
         return enhanced_copy
