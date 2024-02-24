@@ -104,7 +104,7 @@ class Morphological_Spatial_Filters:
                 sobel_vertical_left = orig_image[row-1][col-1] + 2*orig_image[row][col-1] + orig_image[row+1][col-1] - \
                     (orig_image[row-1][col+1] + 2*orig_image[row][col+1] + orig_image[row+1][col+1])
                 
-                # step 2. 
+                # step 2
                 pixel_value = orig_image[row][col] - coefficient*(sobel_vertical_left + sobel_horizontal_bottom)
 
                 # restricting maximum pixel value to prevent overflow when assigning value
