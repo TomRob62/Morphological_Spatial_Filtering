@@ -228,11 +228,11 @@ class Morphological_Spatial_Filters:
             error_content += "\npixel_region shape: " + str(pixel_region.shape)
             raise Exception(error_content)
         
-        # only 1 pixel needs to hit for function to return True
+        # all pixels needs to hit for function to return True
         for row in range(gridWidth):
             for col in range(gridWidth):
-                if pixel_region[row][col] == 1:
-                    if not struct[row][col] == 1:
+                if struct[row][col] == 1:
+                    if not pixel_region[row][col] == 1:
                         return False
                 
         return True
