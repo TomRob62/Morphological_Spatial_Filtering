@@ -225,7 +225,7 @@ class Morphological_Spatial_Filters:
                 new binary image
         """
         # getting dimensions
-        max_row, max_column = orig_image.shape
+        max_row, max_column = orig_image.shape[:2]
 
         # creating space for new array
         binary_image = numpy.zeros(orig_image.shape, dtype = bool)
