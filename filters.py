@@ -345,4 +345,19 @@ class Morphological_Spatial_Filters:
                 
         return True
     # End of function hit
+
+    def min_nonzero(matrix: numpy.ndarray) -> int:
+        """
+            Returns the lowest nonzero number from a square matrix
+        """
+        max_row, max_col = matrix.shape[:2]
+        
+        lowest = numpy.max(matrix)
+
+        for row in range(max_row):
+            for col in range(max_col):
+                if not matrix[row][col] == 0:
+                    if matrix[row][col] < lowest:
+                        lowest = matrix[row][col]
+        return lowest
 # End of class Morphological_Spatial_Filters
