@@ -118,7 +118,7 @@ class Morphological_Spatial_Filters:
         return enhanced_copy
     # End of function sobel_filter
 
-    def binary(orig_image: numpy.ndarray, threshold: int = 215) -> numpy.ndarray:
+    def binary(orig_image: numpy.ndarray, threshold: int = 200) -> numpy.ndarray:
         """
             Converts a grayscale image to binary image based on the threshold provided.
 
