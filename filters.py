@@ -228,6 +228,7 @@ class Morphological_Spatial_Filters:
         max_row, max_column = orig_image.shape[:2]
 
         # if image is color, converting it grayscale
+        if len(orig_image.shape) > 2:
         orig_image = Morphological_Spatial_Filters.grayscale(orig_image)
 
         # creating space for new array
