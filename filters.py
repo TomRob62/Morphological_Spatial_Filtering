@@ -227,6 +227,9 @@ class Morphological_Spatial_Filters:
         # getting dimensions
         max_row, max_column = orig_image.shape[:2]
 
+        # if image is color, converting it grayscale
+        orig_image = Morphological_Spatial_Filters.grayscale(orig_image)
+
         # creating space for new array
         binary_image = numpy.zeros(orig_image.shape, dtype = bool)
 
@@ -240,6 +243,34 @@ class Morphological_Spatial_Filters:
 
         return binary_image
     # End of function binary
+
+    def grayscale(orig_image: numpy.ndarray) -> numpy.ndarray:
+        """
+            A function to convert a color image to grayscale
+
+            Paramaters
+            ----------
+            orig_image: NDarray
+                image array of original image
+
+            Returns
+            --------
+            NDarray
+                grayscale image array
+        """
+        # getting dimensions
+        max_row, max_col = orig_image.shape[:2]
+
+        # creating space for copy
+        gray_image = numpy.zeros((max_row, max_col), dtype = "uint8")
+
+        # avering color pixels into single gray pixel
+        for row in range(max_row):
+            for col in range(max_col):
+                gray_image[row][col] = numpy.average(orig_image[row][col])
+
+        return gray_image
+    # End of function grayscale
 
     def hit(pixel_region: numpy.ndarray, struct_ID: int) -> bool:
         """
