@@ -128,6 +128,46 @@ class Morphological_Spatial_Filters:
         return enhanced_copy
     # End of function sobel_filter
 
+    def dilution(orig_image: numpy.ndarray, struct_ID: int) -> numpy.ndarray:
+        """
+            Function to dilate a binary image given a structure element id
+
+            Paramaters
+            ----------
+            orig_image
+                original image array to be eroded
+            struct_ID
+                The number ID of a structuring element constant
+
+            Returns
+            --------
+            NDArray
+                eroded image array
+        """
+        # dimension of image
+        max_row, max_col = orig_image.shape
+
+        # getting halfwidth
+        struct = Morphological_Spatial_Filters.STRUCT_ELEMENT[struct_ID]
+        halfwidth = len(struct)//2
+
+        # creating space for new enhanced image
+        dilated_copy = numpy.zeros(orig_image.shape, dtype=bool)
+
+        for row in range(halfwidth, max_row-halfwidth):
+            for col in range(halfwidth, max_col-halfwidth):
+                # creating subarray of orig_image to check if fits structuring element
+                region_selection = numpy.zeros(struct.shape)
+                for index in range(len(struct)):
+                    region_selection[index] = orig_image[row + (index-halfwidth)][col-halfwidth:col+halfwidth+1]
+
+                # calling fit function 
+                pixel_value = Morphological_Spatial_Filters.hit(region_selection, struct_ID)
+                dilated_copy[row][col] = pixel_value
+        
+        return dilated_copy
+    # End of function erosion
+
     def erosion(orig_image: numpy.ndarray, struct_ID: int) -> numpy.ndarray:
         """
             Function to erode a binary image given a structure element id
