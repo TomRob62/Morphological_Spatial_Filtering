@@ -156,10 +156,12 @@ class Morphological_Spatial_Filters:
 
         for row in range(halfwidth, max_row-halfwidth):
             for col in range(halfwidth, max_col-halfwidth):
+                # creating subarray of orig_image to check if fits structuring element
                 region_selection = numpy.zeros(struct.shape)
                 for index in range(len(struct)):
                     region_selection[index] = orig_image[row + (index-halfwidth)][col-halfwidth:col+halfwidth+1]
 
+                # calling fit function 
                 pixel_value = Morphological_Spatial_Filters.fit(region_selection, struct_ID)
                 eroded_copy[row][col] = pixel_value
         
