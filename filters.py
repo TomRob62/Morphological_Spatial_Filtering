@@ -18,6 +18,10 @@ class Morphological_Spatial_Filters:
             function to sharpen an image using the laplace filter
 
     """
+    STRUCT_ELEMENT1 = numpy.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])
+    STRUCT_ELEMENT2 = numpy.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]])
+    STRUCT_ELEMENT3 = numpy.array([[0, 0, 1, 0, 0], [0, 1, 1, 1, 0], [1, 1, 1, 1, 1], 
+                                   [0, 1, 1, 1, 0], [0, 0, 1, 0, 0]])
 
     def laplace_filter(orig_image: numpy.ndarray)->numpy.ndarray:
         """
@@ -151,4 +155,86 @@ class Morphological_Spatial_Filters:
         return binary_image
     # End of function binary
 
+    def hit(pixel_region: numpy.ndarray, struct_ID: int) -> bool:
+        """
+            Returns whether a structuring element will hit or miss in a region
+
+            Paramaters
+            -----------
+            pixel_region: NDArray
+                A square matrix of pixels to compare to a structuring element constant
+            struct_ID
+                The number id associated with structuring element constants listed
+
+            Returns
+            -------
+            bool
+                True if any pixels in the struct element hit in the region, false otherwise
+        """
+        gridWidth = len(pixel_region)
+
+        if struct_ID == 3:
+            struct = Morphological_Spatial_Filters.STRUCT_ELEMENT3
+        elif struct_ID == 2:
+            struct = Morphological_Spatial_Filters.STRUCT_ELEMENT2
+        else:
+            struct = Morphological_Spatial_Filters.STRUCT_ELEMENT1
+
+        # if shapes don't match, it will create index-out-bounds later
+        if not struct.shape == pixel_region.shape:
+            error_content = "Not Comparable. Pixel_region.shape must match struct.shape"
+            error_content += "\n\nstructure shape: " + str(struct.shape)
+            error_content += "\npixel_region shape: " + str(pixel_region.shape)
+            raise Exception(error_content)
+        
+        # only 1 pixel needs to hit for function to return True
+        for row in range(gridWidth):
+            for col in range(gridWidth):
+                if struct[row][col] == pixel_region[row][col] == 1:
+                    return True
+                
+        return False
+    # End of function hit
+
+    def fit(pixel_region: numpy.ndarray, struct_ID: int) -> bool:
+        """
+            Returns whether a structuring element will fit or miss in a region
+
+            Paramaters
+            -----------
+            pixel_region: NDArray
+                A square matrix of pixels to compare to a structuring element constant
+            struct_ID
+                The number id associated with structuring element constants listed
+
+            Returns
+            -------
+            bool
+                True if all pixels in the struct element hit in the region, false otherwise
+        """
+        gridWidth = len(pixel_region)
+
+        if struct_ID == 3:
+            struct = Morphological_Spatial_Filters.STRUCT_ELEMENT3
+        elif struct_ID == 2:
+            struct = Morphological_Spatial_Filters.STRUCT_ELEMENT2
+        else:
+            struct = Morphological_Spatial_Filters.STRUCT_ELEMENT1
+
+        # if shapes don't match, it will create index-out-bounds later
+        if not struct.shape == pixel_region.shape:
+            error_content = "Not Comparable. Pixel_region.shape must match struct.shape"
+            error_content += "\n\nstructure shape: " + str(struct.shape)
+            error_content += "\npixel_region shape: " + str(pixel_region.shape)
+            raise Exception(error_content)
+        
+        # only 1 pixel needs to hit for function to return True
+        for row in range(gridWidth):
+            for col in range(gridWidth):
+                if pixel_region[row][col] == 1:
+                    if not struct[row][col] == 1:
+                        return False
+                
+        return True
+    # End of function hit
 # End of class Morphological_Spatial_Filters
