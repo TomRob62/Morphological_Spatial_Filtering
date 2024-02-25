@@ -16,6 +16,12 @@ class Morphological_Spatial_Filters:
         ----------
         laplace_filter
             function to sharpen an image using the laplace filter
+        sobel_filter
+            A function to sharpen an image using the sobel operation
+        hit
+            A support function to determine if a structuring element hits a selection of pixels
+        fit
+            A support function to determine if a structuring elements fits a selection of pixels
 
     """
     STRUCT_ELEMENT1 = numpy.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])
