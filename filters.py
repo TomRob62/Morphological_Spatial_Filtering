@@ -24,10 +24,10 @@ class Morphological_Spatial_Filters:
             A support function to determine if a structuring elements fits a selection of pixels
 
     """
-    STRUCT_ELEMENT1 = numpy.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])
-    STRUCT_ELEMENT2 = numpy.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]])
-    STRUCT_ELEMENT3 = numpy.array([[0, 0, 1, 0, 0], [0, 1, 1, 1, 0], [1, 1, 1, 1, 1], 
-                                   [0, 1, 1, 1, 0], [0, 0, 1, 0, 0]])
+    STRUCT_ELEMENT = [numpy.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]]),
+                    numpy.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]]),
+                    numpy.array([[0, 0, 1, 0, 0], [0, 1, 1, 1, 0], [1, 1, 1, 1, 1], 
+                                   [0, 1, 1, 1, 0], [0, 0, 1, 0, 0]])]
 
     def laplace_filter(orig_image: numpy.ndarray)->numpy.ndarray:
         """
@@ -128,6 +128,44 @@ class Morphological_Spatial_Filters:
         return enhanced_copy
     # End of function sobel_filter
 
+    def erosion(orig_image: numpy.ndarray, struct_ID: int) -> numpy.ndarray:
+        """
+            Function to erode a binary image given a structure element id
+
+            Paramaters
+            ----------
+            orig_image
+                original image array to be eroded
+            struct_ID
+                The number ID of a structuring element constant
+
+            Returns
+            --------
+            NDArray
+                eroded image array
+        """
+        # dimension of image
+        max_row, max_col = orig_image.shape
+
+        # getting halfwidth
+        struct = Morphological_Spatial_Filters.STRUCT_ELEMENT[struct_ID]
+        halfwidth = len(struct)//2
+
+        # creating space for new enhanced image
+        eroded_copy = numpy.zeros(orig_image.shape, dtype=bool)
+
+        for row in range(halfwidth, max_row-halfwidth):
+            for col in range(halfwidth, max_col-halfwidth):
+                region_selection = numpy.zeros(struct.shape)
+                for index in range(len(struct)):
+                    region_selection[index] = orig_image[row + (index-halfwidth)][col-halfwidth:col+halfwidth+1]
+
+                pixel_value = Morphological_Spatial_Filters.fit(region_selection, struct_ID)
+                eroded_copy[row][col] = pixel_value
+        
+        return eroded_copy
+    # End of function erosion
+
     def binary(orig_image: numpy.ndarray, threshold: int = 185) -> numpy.ndarray:
         """
             Converts a grayscale image to binary image based on the threshold provided.
@@ -179,12 +217,7 @@ class Morphological_Spatial_Filters:
         """
         gridWidth = len(pixel_region)
 
-        if struct_ID == 3:
-            struct = Morphological_Spatial_Filters.STRUCT_ELEMENT3
-        elif struct_ID == 2:
-            struct = Morphological_Spatial_Filters.STRUCT_ELEMENT2
-        else:
-            struct = Morphological_Spatial_Filters.STRUCT_ELEMENT1
+        struct = Morphological_Spatial_Filters.STRUCT_ELEMENT[struct_ID]
 
         # if shapes don't match, it will create index-out-bounds later
         if not struct.shape == pixel_region.shape:
@@ -220,12 +253,7 @@ class Morphological_Spatial_Filters:
         """
         gridWidth = len(pixel_region)
 
-        if struct_ID == 3:
-            struct = Morphological_Spatial_Filters.STRUCT_ELEMENT3
-        elif struct_ID == 2:
-            struct = Morphological_Spatial_Filters.STRUCT_ELEMENT2
-        else:
-            struct = Morphological_Spatial_Filters.STRUCT_ELEMENT1
+        struct = Morphological_Spatial_Filters.STRUCT_ELEMENT[struct_ID]
 
         # if shapes don't match, it will create index-out-bounds later
         if not struct.shape == pixel_region.shape:
