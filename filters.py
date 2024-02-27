@@ -257,6 +257,47 @@ class Morphological_Spatial_Filters:
         return enhanced_copy
     # End of function sobel_filter
 
+    def extract_boundary(connect_comp: numpy.ndarray, target_ID, struct_id):
+        """
+            A function to extract the boundary of a component when given the
+            connected component matrix and target_ID
+
+        Paramaters
+        -----------
+        connect_compt: NDArray
+            a matrix of pixel_ID's
+        target_ID
+            the target pixel_ID value
+
+        Returns
+        NDArray
+            image array with the boundary highlighted
+        """
+        # renaming class constant as local variable
+        c_struct = Morphological_Spatial_Filters.STRUCT_ELEMENT[struct_id]
+
+        # getting dimension
+        max_row, max_col = connect_comp.shape
+        width = len(c_struct)
+        half_width = width//2
+
+        # creating space
+        image_array = numpy.zeros(connect_comp.shape, dtype = "uint8")
+        
+        for row in range(half_width, max_row-half_width):
+            for col in range(half_width, max_col-half_width):
+                if connect_comp[row][col] == target_ID:
+                    # creating neighborhood (based on struct_ID given)
+                    neighborhood = numpy.zeros(c_struct.shape)
+                    for index in range(len(c_struct)):
+                        neighborhood[index] = connect_comp[row + (index-half_width)][col-half_width:col+half_width+1]
+
+                    pixel_value = Morphological_Spatial_Filters.hit(neighborhood, struct_id)
+                    pixel_value = pixel_value - Morphological_Spatial_Filters.fit(neighborhood, struct_id)
+                    image_array[row][col] = pixel_value
+        return image_array
+    # end of definition extract boundary
+        
     def dilution(orig_image: numpy.ndarray, struct_ID: int) -> numpy.ndarray:
         """
             Function to dilate a binary image given a structure element id
@@ -432,8 +473,9 @@ class Morphological_Spatial_Filters:
         # only 1 pixel needs to hit for function to return True
         for row in range(gridWidth):
             for col in range(gridWidth):
-                if struct[row][col] == pixel_region[row][col] == 1:
-                    return True
+                if struct[row][col]  == 1:
+                    if not pixel_region[row][col] == 0:
+                        return True
                 
         return False
     # End of function hit
@@ -469,9 +511,8 @@ class Morphological_Spatial_Filters:
         for row in range(gridWidth):
             for col in range(gridWidth):
                 if struct[row][col] == 1:
-                    if not pixel_region[row][col] == 1:
+                    if pixel_region[row][col] == 0:
                         return False
-                
         return True
     # End of function hit
 
