@@ -29,6 +29,114 @@ class Morphological_Spatial_Filters:
                     numpy.array([[0, 0, 1, 0, 0], [0, 1, 1, 1, 0], [1, 1, 1, 1, 1], 
                                    [0, 1, 1, 1, 0], [0, 0, 1, 0, 0]])]
 
+    def connected_comp(orig_image: numpy.ndarray, struct_ID:int  = 1) -> list:
+        """
+            A function that finds connected components and returns:
+             1. an image where each component has a different gray value
+             2. a matrix of orig_image.shape. Contains int ID of each pixel
+             3. table of associative values
+             4. frequence of each row in the table
+
+                Uses two pass algorithm to ID each pixel in a single component has 
+                the same ID, and component has different ID.
+
+            Paramaters
+            -----------
+            orig_image: NDArray
+                the original image array
+            struct_ID: int
+                The class id of the structure used to define the connectivity
+
+            Returns
+            -------
+            conponents_image: NDArray
+                A new image where each component has a unique grayscale value.
+            conn_comp: NDarray
+                a matrix of every ID corresponding to original image.
+            table: 2D list
+                a matrix where each row contains equivalent labels. each row = 1 component.
+            frequency: list
+                a list representing the number of pixels per component.
+        """
+        # getting dimensions
+        max_row, max_column = orig_image.shape[:2]
+        struct_width = len(Morphological_Spatial_Filters.STRUCT_ELEMENT[struct_ID])
+        half_width = struct_width//2
+
+        # if image is not binary, converting it to binary
+        if not orig_image.dtype == bool:
+            orig_image = Morphological_Spatial_Filters.binary(orig_image)
+
+        # creating space for conn_comp array. holds pixel ID's
+        conn_comp = numpy.zeros((max_row, max_column), dtype="uint32")
+
+        # creating table to hold associative (equivalent) labels
+        table = []
+
+        # id variable for labeling pixels with no id or id'd neighbors
+        pixel_id = 1
+
+        # first pass
+        for row in range(half_width, max_row-half_width):
+            for col in range(half_width, max_column-half_width):
+                if not orig_image[row][col] == 0:
+                    # creating neighborhood (based on struct_ID given)
+                    neighborhood = []
+                    for neigh_index in range(struct_width):
+                        width = half_width-neigh_index
+                        neighborhood.append(conn_comp[row + width][col-half_width: col+half_width+1])
+                    neighborhood = numpy.array(neighborhood)
+
+                    # find list of nonzero values sorted
+                    nonzero_neigh = Morphological_Spatial_Filters.list_nonzero(neighborhood, struct_ID)
+
+                    # checking at least 1 value exists in list. 
+                    if len(nonzero_neigh) > 0:
+                        conn_comp[row][col] = nonzero_neigh[0]
+                    else:
+                        # no value exists, so creating new value and adding to list of nonzero
+                        conn_comp[row][col] = pixel_id
+                        nonzero_neigh = [pixel_id]
+                        pixel_id += 1
+
+                    # adding current conn_comp ID to equivalence table
+                    # if id_index == -1, then it doesn't exist in table, so new entry is created
+                    id_index = Morphological_Spatial_Filters.index_of(table, conn_comp[row][col])
+                    if id_index == -1:
+                        table.append(nonzero_neigh)
+                    else:
+                        table[id_index] = Morphological_Spatial_Filters.discrete_append(table[id_index], nonzero_neigh)
+        # first pass done
+        # condense table by merging rows that share values
+        table = Morphological_Spatial_Filters.condense_table(table)
+
+        # creating space for new image that highlights components
+        components_image = numpy.zeros(orig_image.shape, dtype = "uint8")
+
+        # creating frequency table
+        frequency = [0 for num in table]
+
+        # second pass start
+        # reassign id to lowest equivalent id
+        for row in range(half_width, max_row-half_width):
+            for col in range(half_width, max_column-half_width):
+                if not conn_comp[row][col] == 0:
+                    # finding lowest equivelent ID for current pixel
+                    table_index = Morphological_Spatial_Filters.index_of(table, conn_comp[row][col])
+
+                    # creating unique color for each component and populating image array
+                    pixel_value = 200*(table_index/len(table)) + 55
+                    components_image[row][col] = pixel_value
+
+                    # renaming connected_components so to lowest equivalent ID
+                    conn_comp[row][col] = table[table_index][0]
+
+                    # populating frequence table
+                    frequency[table_index] += 1
+
+        return components_image, conn_comp, table, frequency
+    # End of definition connect_comp
+    
     def laplace_filter(orig_image: numpy.ndarray)->numpy.ndarray:
         """
             A function to sharpen an image using the formula described below:
