@@ -337,7 +337,7 @@ class Morphological_Spatial_Filters:
 
         # if image is color, converting it grayscale
         if len(orig_image.shape) > 2:
-        orig_image = Morphological_Spatial_Filters.grayscale(orig_image)
+            orig_image = Morphological_Spatial_Filters.grayscale(orig_image)
 
         # creating space for new array
         binary_image = numpy.zeros(orig_image.shape, dtype = bool)
@@ -454,18 +454,71 @@ class Morphological_Spatial_Filters:
         return True
     # End of function hit
 
-    def min_nonzero(matrix: numpy.ndarray) -> int:
+    def list_nonzero(matrix: numpy.ndarray, struct_id) -> list:
         """
             Returns the lowest nonzero number from a square matrix
         """
-        max_row, max_col = matrix.shape[:2]
+        # checking that at least 1 nonzero exists
+        max_num = numpy.max(matrix)
+        if max_num == 0:
+            return []
         
-        lowest = numpy.max(matrix)
-
+        # bringing current structure as local variable
+        c_struct = Morphological_Spatial_Filters.STRUCT_ELEMENT[struct_id]
+            
+        # getting dimensions
+        max_row, max_col = matrix.shape
+        
+        nonzero = []
         for row in range(max_row):
             for col in range(max_col):
                 if not matrix[row][col] == 0:
-                    if matrix[row][col] < lowest:
-                        lowest = matrix[row][col]
-        return lowest
+                    if c_struct[row][col] == 1:
+                        nonzero.append(matrix[row][col])
+        nonzero.sort()
+        return nonzero
+    # End of function list_nonzer
+
+    def discrete_append(base_array, append_array):
+        """
+        
+        """
+        for num in append_array:
+            if not num in base_array:
+                base_array.append(num)
+        
+        return base_array
+    # End of definition discrete_append
+
+    def index_of(table, target):
+        """
+        
+        """
+        if len(table) == 0:
+            return -1
+        for index, array in enumerate(table):
+            for num in array:
+                if num == target:
+                    return index
+        return -1
+    # End of definition index_of
+
+    def condense_table(table):
+        indexes_to_delete = []
+        for index, array in enumerate(table):
+            for num in array:
+                lowest_index = Morphological_Spatial_Filters.index_of(table, num)
+                if lowest_index == -1:
+                    print("condense_table_error:" + str(num))
+                if not lowest_index == index:
+                    table[lowest_index] = Morphological_Spatial_Filters.discrete_append(table[lowest_index], table[index])
+                    if not index in indexes_to_delete:
+                        indexes_to_delete.append(index)
+
+        indexes_to_delete.sort()
+        for del_index in reversed(indexes_to_delete):
+            del table[del_index]
+
+        return table
+    # end of condense_table
 # End of class Morphological_Spatial_Filters
