@@ -490,12 +490,28 @@ class Morphological_Spatial_Filters:
         return base_array
     # End of definition discrete_append
 
-    def index_of(table, target):
+    def index_of(table: list, target: int) -> int:
         """
-        
+            A support function that returns the index of the row of the target 
+            value or returns -1 if target doesn't exist in table
+
+            Paramaters
+            -----------
+            table: list 
+                A 2D list that contains the equivalency values from conn_comp()
+            target: int
+                the target pixel_ID 
+
+            Returns
+            -------
+            int
+                The index of the row in table of the target, or -1 
         """
+        # checking that values exist in table
         if len(table) == 0:
             return -1
+        
+        # searching table for target
         for index, array in enumerate(table):
             for num in array:
                 if num == target:
