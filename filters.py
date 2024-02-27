@@ -3,7 +3,7 @@
 # Professor Karakaya
 # February 23, 2024
 #
-# last modified February 25, 2024
+# last modified February 26, 2024
 
 import numpy
 
@@ -12,16 +12,37 @@ class Morphological_Spatial_Filters:
         Description:
             This class contain functions to enhance image arrays.
 
+        Constants
+        ----------
+        STRUCT_ELEMENT
+            a list of NDArrays, where each array is a binary structure
+
         Functions
         ----------
+        connect_comp
+            A function that finds connected components
         laplace_filter
             function to sharpen an image using the laplace filter
         sobel_filter
             A function to sharpen an image using the sobel operation
+        dilution
+            A function to dilate a binary image given a structure element id
+        erosion
+            A function to erode a binary image given a structure element id
+        binary
+            Converts a grayscale image to binary image based on the threshold provided.
         hit
             A support function to determine if a structuring element hits a selection of pixels
         fit
             A support function to determine if a structuring elements fits a selection of pixels
+        list_nonzero
+            Returns a list of nonzero numbers that hit in the structure.
+        discrete_append
+            A support function that merges two arrays discretely
+        index_of
+            A support function that returns the index of the row of the target
+        condense_table
+            A support function that specifically searches for redundant values in table
 
     """
     STRUCT_ELEMENT = [numpy.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]]),
