@@ -479,9 +479,23 @@ class Morphological_Spatial_Filters:
         return nonzero
     # End of function list_nonzer
 
-    def discrete_append(base_array, append_array):
+    def discrete_append(base_array: list, append_array:list ) -> list:
         """
-        
+            A support function that merges two arrays discretely, meaning
+            that no repeat values are added
+
+            Paramaters
+            -----------
+            base_array: list
+                The array where new values are put
+            append_array: list
+                The array being added to the base arry
+            
+            Returns
+            --------
+            list
+                An array with no repeating values
+
         """
         for num in append_array:
             if not num in base_array:
