@@ -503,18 +503,38 @@ class Morphological_Spatial_Filters:
         return -1
     # End of definition index_of
 
-    def condense_table(table):
+    def condense_table(table: list) -> list:
+        """
+            A support function that specifically searches for redundant values
+            in table (a variable in conn_comp). If a redundent value is found, it discretely 
+            merges the two row since it means those two rows are connected.
+
+            Paramaters
+            -----------
+            table: list
+                A 2D list that contains the equivalency values from conn_comp()
+
+            Returns
+            --------
+            list
+                A 2D list with no redundancy
+        """
+        # list of indexes of redundant rows 
         indexes_to_delete = []
         for index, array in enumerate(table):
             for num in array:
+                # checking for redundanct
                 lowest_index = Morphological_Spatial_Filters.index_of(table, num)
-                if lowest_index == -1:
-                    print("condense_table_error:" + str(num))
+
                 if not lowest_index == index:
+                    # redundant value found and discretely merging two rows
                     table[lowest_index] = Morphological_Spatial_Filters.discrete_append(table[lowest_index], table[index])
+
+                    # adding index of redundant row if not already there
                     if not index in indexes_to_delete:
                         indexes_to_delete.append(index)
 
+        # deleting redundant rows in descending order
         indexes_to_delete.sort()
         for del_index in reversed(indexes_to_delete):
             del table[del_index]
