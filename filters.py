@@ -454,9 +454,21 @@ class Morphological_Spatial_Filters:
         return True
     # End of function hit
 
-    def list_nonzero(matrix: numpy.ndarray, struct_id) -> list:
+    def list_nonzero(matrix: numpy.ndarray, struct_id: int) -> list:
         """
-            Returns the lowest nonzero number from a square matrix
+            Returns a list of nonzero numbers that hit in the structure.
+
+            Paramaters
+            ---------
+            matrix: NDarray
+                a square matrix of equal shape as the structure
+            struct_id: int
+                The class id of a structure
+
+            Returns
+            -------
+            list
+                a list of nonzero values
         """
         # checking that at least 1 nonzero exists
         max_num = numpy.max(matrix)
@@ -472,9 +484,12 @@ class Morphological_Spatial_Filters:
         nonzero = []
         for row in range(max_row):
             for col in range(max_col):
+                # checking for nonzero
                 if not matrix[row][col] == 0:
+                    # checking that current value hits structure
                     if c_struct[row][col] == 1:
                         nonzero.append(matrix[row][col])
+        # sorting ascending order
         nonzero.sort()
         return nonzero
     # End of function list_nonzer
